@@ -10,15 +10,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-
-    - name: Set up Python
-      uses: actions/setup-python@v2
+    - uses: actions/checkout@v4
+    
+    - uses: actions/setup-python@v5
       with:
         python-version: '3.9'
 
-    - name: Cache Buildozer dependencies
-      uses: actions/cache@v2
+    - uses: actions/cache@v4
       with:
         path: ~/.buildozer
         key: buildozer-deps-${{ hashFiles('buildozer.spec') }}
@@ -38,8 +36,7 @@ jobs:
         BUILDOZER_WARN_ON_ROOT: 1
         PATH: "$PATH:$ANDROID_HOME/platform-tools"
 
-    - name: Upload APK
-      uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v4
       with:
         name: app-debug
         path: bin/*.apk
