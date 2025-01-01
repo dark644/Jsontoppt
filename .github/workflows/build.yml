@@ -10,8 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
+    - uses: actions/checkout@v2
 
     - name: Set up Python
       uses: actions/setup-python@v2
@@ -24,43 +23,20 @@ jobs:
         sudo apt install -y python3-pip openjdk-11-jdk git zip unzip
         pip install --upgrade cython==0.29.19 virtualenv kivy buildozer
 
-    - name: Accept Android SDK Licenses
-      run: |
-        mkdir -p ~/.android
-        echo "count=0" > ~/.android/repositories.cfg
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v2
 
-    - name: Install Android Command-Line Tools and SDK
+    - name: Install Android SDK components
       run: |
-        sudo apt-get install -y wget
-        for i in {1..3}; do
-          wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O cmdline-tools.zip && break || sleep 15
-        done
-        mkdir -p $HOME/.buildozer/android/platform/android-sdk/cmdline-tools
-        unzip cmdline-tools.zip -d $HOME/.buildozer/android/platform/android-sdk/cmdline-tools
-        mv $HOME/.buildozer/android/platform/android-sdk/cmdline-tools/cmdline-tools $HOME/.buildozer/android/platform/android-sdk/cmdline-tools/latest
-        
-        export PATH=$HOME/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin:$PATH
-        
-        for i in {1..3}; do
-          yes | sdkmanager --licenses && break || sleep 15
-        done
-        
-        for i in {1..3}; do
-          sdkmanager "build-tools;33.0.0" "platform-tools" "platforms;android-33" && break || sleep 15
-        done
-
-    - name: Configure Environment Variables
-      run: |
-        echo "ANDROID_HOME=$HOME/.buildozer/android/platform/android-sdk" >> $GITHUB_ENV
-        echo "ANDROID_SDK_ROOT=$HOME/.buildozer/android/platform/android-sdk" >> $GITHUB_ENV
-        echo "PATH=$HOME/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin:$HOME/.buildozer/android/platform/android-sdk/platform-tools:$PATH" >> $GITHUB_ENV
+        yes | sdkmanager --licenses
+        sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.0"
 
     - name: Build APK
       run: |
         if [ ! -f buildozer.spec ]; then buildozer init; fi
         buildozer -v android debug
       env:
-        ANDROIDSDK: ${{ env.ANDROID_HOME }}
+        ANDROID_HOME: ${{ env.ANDROID_SDK_ROOT }}
 
     - name: Upload APK
       uses: actions/upload-artifact@v3
