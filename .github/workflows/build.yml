@@ -46,7 +46,7 @@ jobs:
         ANDROIDNDK: ${{ github.workspace }}/.buildozer/android/platform/android-ndk-r21d
 
     - name: Upload APK
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: my-android-app
         path: bin/
