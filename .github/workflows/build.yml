@@ -29,7 +29,7 @@ jobs:
         mkdir -p ~/.android
         echo "count=0" > ~/.android/repositories.cfg
 
-    - name: Install Build Tools and SDK
+    - name: Install Android Command-Line Tools and SDK
       run: |
         sudo apt-get install -y wget
         wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O cmdline-tools.zip
@@ -39,6 +39,10 @@ jobs:
         mv android-sdk-temp/cmdline-tools/* ~/.buildozer/android/platform/android-sdk/cmdline-tools/latest/
         yes | ~/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses
         ~/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager "build-tools;36.0.0-rc3" "platform-tools" "platforms;android-29"
+
+    - name: Configure Buildozer to Use the Correct SDK Path
+      run: |
+        sed -i 's|tools/bin/sdkmanager|cmdline-tools/latest/bin/sdkmanager|g' ~/.buildozer/android/platform/android-sdk/build-tools || true
 
     - name: Build APK
       run: |
