@@ -39,21 +39,18 @@ jobs:
         yes | ~/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses
         ~/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager "build-tools;36.0.0-rc3" "platform-tools" "platforms;android-29"
 
-    - name: Patch Buildozer to Use Correct SDK Path
-      run: |
-        sed -i 's|tools/bin/sdkmanager|cmdline-tools/latest/bin/sdkmanager|g' ~/.buildozer/android/platform/android-sdk/build-tools || true
-
     - name: Configure Environment Variables
       run: |
-        echo "ANDROIDSDK=~/.buildozer/android/platform/android-sdk" >> $GITHUB_ENV
-        echo "PATH=~/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin:$PATH" >> $GITHUB_ENV
+        echo "ANDROID_HOME=$HOME/.buildozer/android/platform/android-sdk" >> $GITHUB_ENV
+        echo "ANDROID_SDK_ROOT=$HOME/.buildozer/android/platform/android-sdk" >> $GITHUB_ENV
+        echo "PATH=$HOME/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin:$HOME/.buildozer/android/platform/android-sdk/platform-tools:$PATH" >> $GITHUB_ENV
 
     - name: Build APK
       run: |
         if [ ! -f buildozer.spec ]; then buildozer init; fi
         buildozer -v android debug
       env:
-        ANDROIDSDK: ~/.buildozer/android/platform/android-sdk
+        ANDROIDSDK: ${{ env.ANDROID_HOME }}
 
     - name: Upload APK
       uses: actions/upload-artifact@v3
