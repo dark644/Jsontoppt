@@ -32,7 +32,7 @@ jobs:
     - name: Install Android Command-Line Tools and SDK
       run: |
         sudo apt-get install -y wget
-        wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O cmdline-tools.zip
+        wget --tries=3 --retry-connrefused https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O cmdline-tools.zip
         mkdir -p $HOME/.buildozer/android/platform/android-sdk/cmdline-tools
         unzip cmdline-tools.zip -d $HOME/.buildozer/android/platform/android-sdk/cmdline-tools
         mv $HOME/.buildozer/android/platform/android-sdk/cmdline-tools/cmdline-tools $HOME/.buildozer/android/platform/android-sdk/cmdline-tools/latest
