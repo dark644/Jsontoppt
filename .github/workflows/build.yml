@@ -32,12 +32,22 @@ jobs:
     - name: Install Android Command-Line Tools and SDK
       run: |
         sudo apt-get install -y wget
-        wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O cmdline-tools.zip
+        for i in {1..3}; do
+          wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O cmdline-tools.zip && break || sleep 15
+        done
         mkdir -p $HOME/.buildozer/android/platform/android-sdk/cmdline-tools
         unzip cmdline-tools.zip -d $HOME/.buildozer/android/platform/android-sdk/cmdline-tools
         mv $HOME/.buildozer/android/platform/android-sdk/cmdline-tools/cmdline-tools $HOME/.buildozer/android/platform/android-sdk/cmdline-tools/latest
-        yes | $HOME/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses
-        $HOME/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager "build-tools;36.0.0-rc3" "platform-tools" "platforms;android-29"
+        
+        export PATH=$HOME/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin:$PATH
+        
+        for i in {1..3}; do
+          yes | sdkmanager --licenses && break || sleep 15
+        done
+        
+        for i in {1..3}; do
+          sdkmanager "build-tools;33.0.0" "platform-tools" "platforms;android-33" && break || sleep 15
+        done
 
     - name: Configure Environment Variables
       run: |
