@@ -18,19 +18,23 @@ jobs:
       with:
         python-version: '3.9'
 
+    - name: Cache pip dependencies
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
     - name: Install dependencies
       run: |
-        pip install kivy
-        pip install buildozer
+        pip install kivy buildozer
 
     - name: Build APK
       run: |
         sudo apt update
         sudo apt install -y python3-pip openjdk-11-jdk git zip unzip
         pip install --upgrade cython==0.29.19 virtualenv
-        
-        # Install Buildozer and dependencies
-        pip install buildozer
         
         # Initialize Buildozer if not already initialized
         if [ ! -f buildozer.spec ]; then buildozer init; fi
@@ -39,6 +43,7 @@ jobs:
         buildozer -v android debug
       env:
         ANDROIDSDK: ${{ github.workspace }}/.buildozer/android/platform/android-sdk
+        ANDROIDNDK: ${{ github.workspace }}/.buildozer/android/platform/android-ndk-r21d
 
     - name: Upload APK
       uses: actions/upload-artifact@v2
